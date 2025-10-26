@@ -1,145 +1,443 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html> 
+<html lang="es">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title></title>
-	<link rel="stylesheet" href="detalles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ofrenda Tradicional - Día de Muertos</title>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<style>
+/* ---- GENERAL ---- */
+body {
+    margin: 0;
+    overflow: hidden;
+    background: radial-gradient(circle at bottom, #1a0933 0%, #000 80%);
+    font-family: 'Poppins', sans-serif;
+    color: #fff;
+}
+
+/* ---- CANVAS FUEGOS ---- */
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 0;
+}
+
+/* ---- FONDO DE CORAZONES DE FLORES ---- */
+#flores-corazones {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+}
+.corazon-floral {
+    position: absolute;
+    font-size: 2rem;
+    opacity: 0.7;
+    animation: flotarCorazon 12s linear infinite;
+    filter: drop-shadow(0 0 6px rgba(255,150,200,0.6));
+}
+@keyframes flotarCorazon {
+    0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 0.9; }
+    50% { transform: translateY(-40px) scale(1.2) rotate(10deg); opacity: 1; }
+    100% { transform: translateY(100vh) scale(0.8) rotate(360deg); opacity: 0; }
+}
+
+/* ---- PAPEL PICADO ---- */
+.papel-picado {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 140px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 8px;
+    padding-top: 15px;
+    z-index: 3;
+    animation: balanceo 3s ease-in-out infinite alternate;
+}
+.papel-picado::before {
+    content: "";
+    position: absolute;
+    top: 10px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: #f5deb3;
+    z-index: 5;
+}
+@keyframes balanceo {
+    from { transform: rotate(1deg); }
+    to { transform: rotate(-1deg); }
+}
+
+/* ---- BANDERAS SVG ---- */
+.banderita {
+    width: 120px;
+    height: 90px;
+    background: var(--color);
+    border: 3px dashed rgba(255,255,255,0.7);
+    border-radius: 3px;
+    clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 12px rgba(0,0,0,0.5);
+}
+.banderita svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: rgba(255,255,255,0.85);
+    stroke-width: 1.5px;
+}
+
+/* ---- OFRENDA ---- */
+.ofrenda {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 85%;
+    height: 310px;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Base y niveles */
+.nivel {
+    width: 100%;
+    background: linear-gradient(to top, #4a2600, #8b4513);
+    border-top: 3px solid #ffcc66;
+    box-shadow: 0 -2px 15px rgba(255, 200, 50, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 30px;
+    padding: 15px;
+}
+.nivel1 { height: 90px; border-radius: 20px 20px 0 0; }
+.nivel2 { height: 80px; width: 80%; border-radius: 15px; }
+.nivel3 { height: 70px; width: 60%; border-radius: 10px; }
+
+/* Elementos */
+.elemento {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #fff3b0;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 0 0 6px rgba(255,255,0,0.4);
+}
+.elemento img {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+    border-radius: 8px;
+    animation: flotar 3s ease-in-out infinite alternate;
+    filter: drop-shadow(0 0 6px rgba(255,180,0,0.6));
+}
+@keyframes flotar {
+    from { transform: translateY(0); }
+    to { transform: translateY(-6px); }
+}
+
+/* Velas animadas */
+.vela {
+    width: 25px;
+    height: 60px;
+    background: #fff3d0;
+    border-radius: 5px;
+    position: relative;
+    box-shadow: 0 0 10px #ffef9f;
+}
+.vela::before {
+    content: "";
+    position: absolute;
+    top: -12px;
+    left: 8px;
+    width: 8px;
+    height: 12px;
+    background: radial-gradient(circle, #ff8a00 20%, rgba(255,255,0,0.4) 70%);
+    border-radius: 50%;
+    animation: llama 0.25s infinite alternate;
+}
+@keyframes llama {
+    from { transform: scale(1) rotate(-2deg); opacity: 0.9; }
+    to { transform: scale(1.1) rotate(2deg); opacity: 1; }
+}
+
+/* Marco con foto */
+.marco {
+    width: 100px;
+    height: 120px;
+    background: #cfa974;
+    border: 5px ridge #ffcc33;
+    border-radius: 8px;
+    position: relative;
+    box-shadow: 0 0 20px rgba(255,200,0,0.4);
+    overflow: hidden;
+}
+.marco::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(255,255,200,0.1), transparent 80%);
+}
+.marco img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+    filter: brightness(1.05) contrast(1.1);
+}
+
+/* ---- POEMA estilo STAR WARS ---- */
+.poema-contenedor {
+    position: absolute;
+    bottom: -200px;
+    width: 100%;
+    height: 100vh;
+    perspective: 400px;
+    overflow: hidden;
+    z-index: 5;
+}
+.poema {
+    position: absolute;
+    bottom: 0;
+    width: 80%;
+    left: 50%;
+    transform: translateX(-50%) rotateX(25deg);
+    transform-origin: 50% 100%;
+    font-family: 'Pacifico', cursive;
+    font-size: 2.2rem;
+    line-height: 2.4rem;
+    letter-spacing: 1px;
+    color: #ffdf99;
+    text-shadow: 0 0 25px rgba(255,200,100,0.9);
+    text-align: center;
+    white-space: pre-line;
+    animation: crawl 120s linear infinite;
+}
+@keyframes crawl {
+    0% { bottom: -120%; opacity: 1; }
+    90% { bottom: 260%; opacity: 1; }
+    100% { bottom: 280%; opacity: 0; }
+}
+
+/* ---- Lluvia de pétalos ---- */
+.petalo {
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    background: radial-gradient(orange, #ff8800);
+    border-radius: 50%;
+    opacity: 0.8;
+    z-index: 1;
+    animation: caer 6s linear forwards;
+}
+@keyframes caer {
+    0% { transform: translateY(0) rotate(0deg); }
+    100% { transform: translateY(100vh) rotate(360deg); opacity: 1; }
+}
+</style>
 </head>
-<body >
-	<div class="fuego"></div>
-  <div class="fuego"></div>
-  <div class="fuego"></div>
-  <div class="fuego"></div>
-  <div class="fuego"></div>
+<body>
 
-  <div class="petalo"></div>
-  <div class="petalo"></div>
-  <div class="petalo"></div>
-  <div class="petalo"></div>
-  <div class="petalo"></div>
-  <div class="petalo"></div>
-  <div class="petalo"></div>
-  <div class="petalo"></div>
-  <div class="petalo"></div>
-<h1 style=" color: gold; font-size: 40px; font-weight: bold; text-align: center;">El aroma de tu recuerdo</h1>
-<center><table border="1" width="900" height="900"></center>
-	<tr>
-		<td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #003366;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #003366;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td><td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>
-	</tr>
-	<td style="background-color: #003366;"></td><td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td><td style="background-color: #003366;"></td><td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td><td style="background-color: #003366;"></td><td style="background-color: #003366;"></td><td style="background-color: #FFA500;"></td><td style="background-color: #003366;"></td><td style="background-color: #003366;"></td><td style="background-color: #FFA500;"></td><td style="background-color: #003366;"></td><td style="background-color: #003366;"></td><td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td><td style="background-color: #003366;"></td><td style="background-color: #003366;"></td><td style="background-color: #003366;"></td><td style="background-color: #800080;"></td><td style="background-color: #800080;"></td><td style="background-color: #800080;"></td><td style="background-color: #003366;"></td><td style="background-color: #003366;"></td><td style="background-color: #800080;"></td><td style="background-color: #003366;"></td><td style="background-color: #003366;"></td><td style="background-color: #800080;"></td><td style="background-color: #003366;"></td><td style="background-color: #003366;"></td><td style="background-color: #800080;"></td><td style="background-color: #800080;"></td><td style="background-color: #800080;"></td><td style="background-color: #003366;"></td><td style="background-color: #003366;"></td><td style="background-color: #003366;"></td><td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td><td style="background-color: #003366;"></td><td style="background-color: #003366;"></td><td style="background-color: #FFA500;"></td><td style="background-color: #003366;"></td><td style="background-color: #003366;"></td><td style="background-color: #FFA500;"></td><td style="background-color: #003366;"></td><td style="background-color: #003366;"></td><td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td><td style="background-color: #003366;"></td><td style="background-color: #003366;"></td><td style="background-color: #003366;"></td><td style="background-color: #800080;"></td><td style="background-color: #800080;"></td><td style="background-color: #800080;"></td><td style="background-color: #003366;"></td><td style="background-color: #003366;"></td><td style="background-color: #800080;"></td><td style="background-color: #003366;"></td><td style="background-color: #003366;"></td><td style="background-color: #800080;"></td><td style="background-color: #003366;"></td><td style="background-color: #003366;"></td><td style="background-color: #800080;"></td><td style="background-color: #800080;"></td><td style="background-color: #800080;"></td><td style="background-color: #003366;"></td><td style="background-color: #003366;"></td><td style="background-color: #003366;"></td><td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td><td style="background-color: #003366;"></td><td style="background-color: #003366;"></td><td style="background-color: #FFA500;"></td><td style="background-color: #003366;"></td><td style="background-color: #003366;"></td><td style="background-color: #FFA500;"></td><td style="background-color: #003366;"></td><td style="background-color: #003366;"></td><td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td><td style="background-color: #003366;"></td><td style="background-color: #003366;"></td><td style="background-color: #003366;"></td><td style="background-color: #003366;"></td>
+<canvas id="fuegos"></canvas>
 
-	<tr>
-		<td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td  style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #003366;"></td><td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>
-	</tr>
-	<tr>
-		<td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td  style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #003366;"></td><td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #003366;"></td><td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>
-	</tr>	
-	<tr>
-		<td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td  style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #003366;"></td><td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>
-	</tr>
-	<tr>
-		<td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td  style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #003366;"></td><td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>
-	</tr>
-	<tr>
-		<td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td  style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td><td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #003366;"></td><td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>
-	</tr>
-	<tr>
-		<td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td  style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #003366;"></td><td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>
-	</tr>
-	<tr>
-		<td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td  style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #003366;"></td><td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>
-	</tr>
-	<tr>
-		<td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td  style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td><td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td><td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td> <td style="background-color: #FFA500;"></td>  <td style="background-color: #FFA500;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td> <td style="background-color: #003366;"></td>  <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td> <td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #800080;"></td>  <td style="background-color: #800080;"></td><td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td><td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>  <td style="background-color: #003366;"></td>
-	</tr>
-	<tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-	<tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-	<tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-    <tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-	<tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-	<tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-	<tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-	<tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-	<tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-	<tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-    <tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-	<tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-	<tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-	<tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-	<tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-	<tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-	<tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-    <tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-	<tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-	<tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-	<tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-	<tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-	<tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-	<tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-	<tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-	<tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-	<tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-	<tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-	<tr>
-		<td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td> <td></td>  <td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td><td></td>  <td></td>
-	</tr>
-</table>
+<!-- Fondo de corazones florales -->
+<div id="flores-corazones"></div>
+
+<!-- PAPEL PICADO -->
+<div class="papel-picado" id="papel"></div>
+
+<!-- POEMA ESTILO STAR WARS -->
+<div class="poema-contenedor">
+  <div class="poema">
+“Brindis por la Vida y los que Amamos”
+
+Hoy la luna se disfraza de vela,
+y el viento susurra canciones viejas.
+Los que amamos regresan ligeros,
+bailando entre flores y centellas.
+
+El pan de muerto huele a recuerdo,
+el cempasúchil pinta el sendero.
+Cada pétalo cuenta un momento,
+cada risa revive un te quiero.
+
+No hay llanto en la mesa encendida,
+solo brindis, abrazos y vida.
+Porque el alma no muere, camina,
+se transforma, sonríe, ilumina.
+
+Los que se fueron nos dejan su huella,
+un consejo, un beso, una estrella.
+Nos dicen: “no temas al paso del tiempo,
+vive intenso, sin miedo, completo.”
+
+Que si el mañana se escapa callado,
+no duela lo que no fue intentado.
+Ama sin freno, ríe sin duda,
+que el corazón libre nunca se muda.
+
+Hoy celebro tu risa, la mía,
+la chispa sagrada del día.
+Porque la muerte no es despedida,
+es promesa de eterna alegría.
+  </div>
+</div>
+
+<!-- OFRENDA -->
+<div class="ofrenda">
+    <div class="nivel nivel3">
+        <div class="elemento"><div class="vela"></div></div>
+        <div class="elemento">
+            <div class="marco">
+                <img src="https://tse2.mm.bing.net/th/id/OIP.qvdo5vPCQf401ECQI6IaAQHaEc?w=310&h=185&c=7&r=0&o=7&cb=12&pid=1.7&rm=3" alt="Foto del ser querido">
+            </div>
+            <div>❤️ En memoria</div>
+        </div>
+        <div class="elemento"><div class="vela"></div></div>
+    </div>
+
+    <div class="nivel nivel2">
+        <div class="elemento">
+            <img src="https://tse4.mm.bing.net/th/id/OIP.vII3f3jrEfqddPqniA_PTwHaHa?w=176&h=180&c=7&r=0&o=7&cb=12&pid=1.7&rm=3" alt="Flor de Cempasúchil">
+            <div>🌼 Cempasúchil</div>
+        </div>
+        <div class="elemento">
+            <img src="https://media1.giphy.com/media/WQ0sOioSF70BE1cArJ/source.gif" alt="Pan de Muerto">
+            <div>🍞 Pan de Muerto</div>
+        </div>
+        <div class="elemento">
+            <img src="https://th.bing.com/th/id/R.2a7c65f99f73eca0797dddd9f98ed817?rik=uLZpwjv68fqsJw&pid=ImgRaw&r=0" alt="Calavera Decorada">
+            <div>💀 Calavera</div>
+        </div>
+        <div class="elemento">
+            <img src="https://tse3.mm.bing.net/th/id/OIP.Di1weQfpX57_W1wKbbwTDgHaGT?w=208&h=180&c=7&r=0&o=7&cb=12&pid=1.7&rm=3" alt="Flores">
+            <div>💐 Flores</div>
+        </div>
+    </div>
+
+    <div class="nivel nivel1">
+        <div class="elemento"><img src="https://i.imgur.com/Wl4vQXc.png" alt="Recuerdos"><div>Recuerdos</div></div>
+        <div class="elemento"><img src="https://i.imgur.com/vfwnuKy.png" alt="Decoración"><div>Decoración</div></div>
+        <div class="elemento"><img src="https://i.imgur.com/Zn1t8zn.png" alt="Dulces"><div>Dulces</div></div>
+    </div>
+</div>
+
+<script>
+/* ---- PAPEL PICADO ---- */
+const colores = ['#ff4d4d', '#ffcc00', '#66ff66', '#66ccff', '#ff66ff', '#ffa500', '#ff3399', '#00cc99'];
+const contenedor = document.getElementById('papel');
+for (let i = 0; i < 14; i++) {
+    const band = document.createElement('div');
+    band.className = 'banderita';
+    band.style.setProperty('--color', colores[i % colores.length]);
+    band.innerHTML = `
+        <svg viewBox="0 0 100 70">
+            <circle cx="20" cy="20" r="5"/>
+            <circle cx="50" cy="20" r="5"/>
+            <circle cx="80" cy="20" r="5"/>
+            <path d="M10,50 Q50,10 90,50" stroke-width="2"/>
+            <circle cx="50" cy="40" r="8"/>
+            <path d="M20,60 L80,60" stroke-width="2"/>
+        </svg>
+    `;
+    contenedor.appendChild(band);
+}
+
+/* ---- LLUVIA DE CEMPASÚCHIL ---- */
+function crearPetalo() {
+    const petalo = document.createElement('div');
+    petalo.classList.add('petalo');
+    petalo.style.left = Math.random() * 100 + 'vw';
+    petalo.style.animationDuration = 4 + Math.random() * 4 + 's';
+    document.body.appendChild(petalo);
+    petalo.addEventListener('animationend', () => petalo.remove());
+}
+setInterval(crearPetalo, 150);
+
+/* ---- FUEGOS ARTIFICIALES ---- */
+const canvas = document.getElementById('fuegos');
+const ctx = canvas.getContext('2d');
+let w = canvas.width = innerWidth;
+let h = canvas.height = innerHeight;
+window.addEventListener('resize', () => { w = canvas.width = innerWidth; h = canvas.height = innerHeight; });
+
+class Particle {
+    constructor(x, y, color) {
+        this.x = x; this.y = y;
+        const angle = Math.random() * 2 * Math.PI;
+        const speed = Math.random() * 5 + 2;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.life = 100;
+        this.color = color;
+    }
+    update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.05;
+        this.life--;
+    }
+    draw(ctx) {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 2, 0, 2 * Math.PI);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+    }
+}
+
+const fireworks = [];
+function newFirework() {
+    const color = colores[Math.floor(Math.random() * colores.length)];
+    fireworks.push({
+        particles: Array.from({ length: 60 }, () => new Particle(Math.random()*w, Math.random()*h/2, color))
+    });
+}
+
+function loop() {
+    ctx.fillStyle = "rgba(0,0,0,0.2)";
+    ctx.fillRect(0,0,w,h);
+    if (Math.random() < 0.04) newFirework();
+
+    fireworks.forEach((f, i) => {
+        f.particles.forEach(p => { p.update(); p.draw(ctx); });
+        f.particles = f.particles.filter(p => p.life > 0);
+        if (f.particles.length === 0) fireworks.splice(i, 1);
+    });
+    requestAnimationFrame(loop);
+}
+loop();
+
+/* ---- CORAZONES FLORALES ---- */
+const fondo = document.getElementById('flores-corazones');
+const flores = ['🌸','🌹','💐','🌼','💮','🌺'];
+function crearCorazonFloral() {
+    const c = document.createElement('div');
+    c.classList.add('corazon-floral');
+    c.textContent = flores[Math.floor(Math.random() * flores.length)];
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.top = '-5vh';
+    c.style.fontSize = (1 + Math.random() * 2) + 'rem';
+    c.style.animationDuration = (8 + Math.random() * 8) + 's';
+    fondo.appendChild(c);
+    c.addEventListener('animationend', ()=>c.remove());
+}
+setInterval(crearCorazonFloral, 500);
+</script>
 </body>
 </html>
